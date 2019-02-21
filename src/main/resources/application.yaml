@@ -1,6 +1,6 @@
 spring:
   kafka:
-    bootstrap-servers: localhost:9092 # Your local Docker.
+    bootstrap-servers: "localhost:9092" # Your local Docker.
     consumer:
       group-id: "poc_group_id"
 

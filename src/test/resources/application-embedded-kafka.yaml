@@ -1,5 +1,11 @@
 spring:
   kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    bootstrap-servers: "${spring.embedded.kafka.brokers}"
     properties:
-      security.protocol: PLAINTEXT
+      security.protocol: "PLAINTEXT"
+
+my:
+  config:
+    topics:
+      hot: "hot_test_topic"
+      cold: "cold_test_topic"

@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "my.config.limit",
+      "type": "java.lang.Integer",
+      "description": "Values equal to or higher than this go into the 'hot' topic."
+    },
+    {
+      "name": "my.config.topics",
+      "type": "no.nav.poc.kafka.ApplicationConfig$Topics",
+      "description": "The topics used for 'hot' and 'cold' content."
+    },
+    {
+      "name": "my.config.topics.hot",
+      "type": "java.lang.String",
+      "description": "Name of the 'hot' topic."
+    },
+    {
+      "name": "my.config.topics.cold",
+      "type": "java.lang.String",
+      "description": "Name of the 'cold' topic."
+    }
+  ]
+}
