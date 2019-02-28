@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "my.config")
 @Getter
 @Setter
-public class ApplicationConfig {
+public class AppConfig {
 
     private int limit = 0;
 

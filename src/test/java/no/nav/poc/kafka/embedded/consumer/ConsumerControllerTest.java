@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import no.nav.poc.kafka.embedded.common.SomeJsonContent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,20 +21,32 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ConsumerControllerTest {
 
-    private static final ConsumerContent ONE = new ConsumerContent(1, "One");
-    private static final ConsumerContent TWO = new ConsumerContent(2, "Two");
-    private static final ConsumerContent THREE = new ConsumerContent(3, "Three");
+    private static final SomeJsonContent ONE = SomeJsonContent
+        .builder()
+        .celcius(1)
+        .message("One")
+        .build();
+    private static final SomeJsonContent TWO = SomeJsonContent
+        .builder()
+        .celcius(2)
+        .message("Two")
+        .build();
+    private static final SomeJsonContent THREE = SomeJsonContent
+        .builder()
+        .celcius(3)
+        .message("Three")
+        .build();
 
     @LocalServerPort
     private int port;
 
     @MockBean
-    ReceivingService mockedReceivingService;
+    ConsumerService mockedConsumerService;
 
     @Before
     public void before() {
 
-        when(mockedReceivingService.receive())
+        when(mockedConsumerService.receive())
             .thenReturn(Arrays.asList(ONE, TWO, THREE));
 
     }

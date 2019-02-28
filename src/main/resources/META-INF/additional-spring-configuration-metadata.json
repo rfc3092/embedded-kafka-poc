@@ -7,7 +7,7 @@
     },
     {
       "name": "my.config.topics",
-      "type": "no.nav.poc.kafka.ApplicationConfig$Topics",
+      "type": "no.nav.poc.kafka.AppConfig$Topics",
       "description": "The topics used for 'hot' and 'cold' content."
     },
     {

@@ -6,7 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-import no.nav.poc.kafka.embedded.consumer.ReceivingService;
+import no.nav.poc.kafka.embedded.common.SomeJsonContent;
+import no.nav.poc.kafka.embedded.consumer.ConsumerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,15 +25,15 @@ public class ProducerControllerTest {
     private int port;
 
     @MockBean
-    private ReceivingService mockedReceivingService; // Not used, but mocked out to avoid Kafka setup issues.
+    private ConsumerService mockedConsumerService; // Not used, but mocked out to avoid Kafka setup issues.
 
     @MockBean
-    private SendingService mockedSendingService;
+    private ProducerService mockedProducerService;
 
     @Before
     public void before() {
 
-        when(mockedSendingService.send(any(ProducerContent.class)))
+        when(mockedProducerService.send(any(SomeJsonContent.class)))
             .thenReturn(UUID.randomUUID());
 
     }
@@ -40,7 +41,7 @@ public class ProducerControllerTest {
     @Test
     public void controllerShouldAcceptValidContent() {
 
-        ProducerContent content = ProducerContent
+        SomeJsonContent content = SomeJsonContent
             .builder()
             .celcius(0)
             .message("Some message...")
@@ -82,7 +83,7 @@ public class ProducerControllerTest {
             .when()
             .accept(JSON)
             .contentType(JSON)
-            .body(ProducerContent.builder().build())
+            .body(SomeJsonContent.builder().build())
             .post("/producer")
             .then()
             .assertThat()

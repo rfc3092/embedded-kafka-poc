@@ -1,0 +1,16 @@
+{
+  "namespace": "no.nav.poc.kafka.avro",
+  "type": "record",
+  "name": "SomeAvroContent",
+  "fields": [
+    {
+      "name": "celcius",
+      "type": "int"
+    },
+    {
+      "name": "message",
+      "type": "string"
+    }
+  ]
+}
+

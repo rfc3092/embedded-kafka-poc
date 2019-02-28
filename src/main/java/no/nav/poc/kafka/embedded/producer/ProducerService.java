@@ -3,26 +3,28 @@ package no.nav.poc.kafka.embedded.producer;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.poc.kafka.ApplicationConfig;
+import no.nav.poc.kafka.AppConfig;
+import no.nav.poc.kafka.avro.SomeAvroContent;
+import no.nav.poc.kafka.embedded.common.SomeJsonContent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class SendingService {
+class ProducerService {
 
-    private final ApplicationConfig config;
-    private final KafkaTemplate<String, String> template;
+    private final AppConfig config;
+    private final KafkaTemplate<String, SomeAvroContent> template;
 
-    UUID send(ProducerContent content) {
+    UUID send(SomeJsonContent content) {
 
         UUID id = UUID.randomUUID();
         String topic = getTopic(content.getCelcius());
         log.info("Sending content {} to topic {}", content, topic);
 
         template
-            .send(topic, id.toString(), content.getMessage())
+            .send(topic, id.toString(), mapFromDomain(content))
             .addCallback(
                 s -> log.error("Successfully sent message with result {}", s),
                 f -> log.error("Failed to send message", f.getCause())
@@ -33,6 +35,14 @@ class SendingService {
 
     private String getTopic(int celcius) {
         return celcius >= config.getLimit() ? config.getTopics().getHot() : config.getTopics().getCold();
+    }
+
+    private static SomeAvroContent mapFromDomain(SomeJsonContent content) {
+        return SomeAvroContent
+            .newBuilder()
+            .setCelcius(content.getCelcius())
+            .setMessage(content.getMessage())
+            .build();
     }
 
 }

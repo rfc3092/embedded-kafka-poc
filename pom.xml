@@ -18,6 +18,8 @@
 
   <properties>
     <java.version>11</java.version>
+
+    <avro.version>1.8.2</avro.version>
     <hamcrest.version>2.1</hamcrest.version>
     <kafka-avro-serializer.version>5.1.0</kafka-avro-serializer.version>
   </properties>
@@ -57,6 +59,24 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Avro. -->
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>${avro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-avro-serializer</artifactId>
+      <version>${kafka-avro-serializer.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <!-- Others. -->
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -76,6 +96,26 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>${avro.version}</version>
+        <configuration>
+          <stringType>String</stringType>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>schema</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
