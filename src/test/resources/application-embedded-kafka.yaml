@@ -5,6 +5,8 @@ spring:
       security.protocol: "PLAINTEXT"
       schema.registry.url: "http://ignored:8081" # Required by MockSchemaRegistryClient, according to docs.
       specific.avro.reader: true # Required by MockSchemaRegistryClient, according to docs.
+  main:
+    allow-bean-definition-overriding: true
 
 my:
   config:

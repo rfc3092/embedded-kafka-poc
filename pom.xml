@@ -20,7 +20,6 @@
     <java.version>11</java.version>
 
     <avro.version>1.8.2</avro.version>
-    <hamcrest.version>2.1</hamcrest.version>
     <kafka-avro-serializer.version>5.1.0</kafka-avro-serializer.version>
   </properties>
 

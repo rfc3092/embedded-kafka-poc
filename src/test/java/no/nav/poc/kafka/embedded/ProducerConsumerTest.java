@@ -2,16 +2,14 @@ package no.nav.poc.kafka.embedded;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.poc.kafka.AppConfig;
 import no.nav.poc.kafka.avro.SomeAvroContent;
@@ -34,7 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("embedded-kafka")
 @Import(MockSchemaRegistryClientConfig.class)
-@EmbeddedKafka
+@EmbeddedKafka(controlledShutdown = true)
 @DirtiesContext
 @Slf4j
 public class ProducerConsumerTest {
@@ -59,13 +57,13 @@ public class ProducerConsumerTest {
 
         schemaRegistryClient.register(config.getTopics().getHot() + "-value", SomeAvroContent.getClassSchema());
         schemaRegistryClient.register(config.getTopics().getCold() + "-value", SomeAvroContent.getClassSchema());
+        Thread.sleep(2000); // Let embedded Kafka get ready.
 
     }
 
 
     @Test
-    public void testSendAndReceiveOfMultipleMessages()
-        throws Exception {
+    public void testSendAndReceiveOfMultipleMessages() {
 
         List<SomeJsonContent> sent = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
@@ -78,9 +76,10 @@ public class ProducerConsumerTest {
                 .message(message)
                 .build();
             log.info("Preparing to send {}", content);
-            UUID response = given()
+            SomeJsonContent response = given()
                 .port(port)
                 .contentType(JSON)
+                .accept(JSON)
                 .body(content)
                 .post("/producer")
                 .then()
@@ -88,27 +87,25 @@ public class ProducerConsumerTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(UUID.class);
-            log.info("Got UUID {} in response", response);
-            sent.add(content);
+                .as(SomeJsonContent.class);
+            log.info("Got UUID {} in response", response.getUuid());
+            sent.add(response);
 
         }
 
-        Thread.sleep(10000);
-
         SomeJsonContent[] received = given()
-                .port(port)
-                .accept(JSON)
-                .get("/consumer")
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .contentType(JSON)
-                .extract()
-                .body()
-                .as(SomeJsonContent[].class);
+            .port(port)
+            .accept(JSON)
+            .get("/consumer")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .contentType(JSON)
+            .extract()
+            .body()
+            .as(SomeJsonContent[].class);
 
-        // TODO: Fix assertions.
+        assertThat(sent.size(), equalTo(received.length));
         assertThat(sent, containsInAnyOrder(received));
 
     }

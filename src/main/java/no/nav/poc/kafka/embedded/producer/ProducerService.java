@@ -1,6 +1,7 @@
 package no.nav.poc.kafka.embedded.producer;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.poc.kafka.AppConfig;
@@ -17,19 +18,29 @@ class ProducerService {
     private final AppConfig config;
     private final KafkaTemplate<String, SomeAvroContent> template;
 
-    UUID send(SomeJsonContent content) {
+    SomeJsonContent send(SomeJsonContent content) {
 
-        UUID id = UUID.randomUUID();
+        content.setUuid(UUID.randomUUID());
         String topic = getTopic(content.getCelcius());
         log.info("Sending content {} to topic {}", content, topic);
 
-        template
+        try {
+            template
+                .send(topic, content.getUuid().toString(), mapFromDomain(content))
+                .get();
+        } catch (ExecutionException e) {
+            log.error("Failed to send message", e);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted while waiting to send");
+        }
+        // Just do it synchronized here to make tests behave better...
+/*        template
             .send(topic, id.toString(), mapFromDomain(content))
             .addCallback(
                 s -> log.error("Successfully sent message with result {}", s),
                 f -> log.error("Failed to send message", f.getCause())
-            );
-        return id;
+            );*/
+        return content;
 
     }
 
@@ -40,6 +51,7 @@ class ProducerService {
     private static SomeAvroContent mapFromDomain(SomeJsonContent content) {
         return SomeAvroContent
             .newBuilder()
+            .setUuid(content.getUuid().toString())
             .setCelcius(content.getCelcius())
             .setMessage(content.getMessage())
             .build();

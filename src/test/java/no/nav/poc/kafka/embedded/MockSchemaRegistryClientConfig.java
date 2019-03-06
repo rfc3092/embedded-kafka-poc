@@ -29,11 +29,9 @@ public class MockSchemaRegistryClientConfig {
         return new KafkaAvroSerializer(client, properties.buildProducerProperties());
     }
 
-    // TODO: This ain't pretty.
-    @SuppressWarnings("unchecked")
     @Bean
     ProducerFactory producerFactory(KafkaProperties properties, KafkaAvroSerializer serializer) {
-        return new DefaultKafkaProducerFactory(
+        return new DefaultKafkaProducerFactory<>(
             properties.buildProducerProperties(),
             new StringSerializer(),
             serializer
@@ -50,11 +48,9 @@ public class MockSchemaRegistryClientConfig {
         return new KafkaAvroDeserializer(client, properties.buildConsumerProperties());
     }
 
-    // TODO: This ain't pretty.
-    @SuppressWarnings("unchecked")
     @Bean
     ConsumerFactory consumerFactory(KafkaProperties properties, KafkaAvroDeserializer deserializer) {
-        return new DefaultKafkaConsumerFactory(
+        return new DefaultKafkaConsumerFactory<>(
             properties.buildConsumerProperties(),
             new StringDeserializer(),
             deserializer
