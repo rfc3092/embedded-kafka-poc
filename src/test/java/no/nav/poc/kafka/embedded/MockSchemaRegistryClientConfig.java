@@ -30,7 +30,7 @@ public class MockSchemaRegistryClientConfig {
     }
 
     @Bean
-    ProducerFactory producerFactory(KafkaProperties properties, KafkaAvroSerializer serializer) {
+    ProducerFactory<?, ?> producerFactory(KafkaProperties properties, KafkaAvroSerializer serializer) {
         return new DefaultKafkaProducerFactory<>(
             properties.buildProducerProperties(),
             new StringSerializer(),
@@ -49,7 +49,7 @@ public class MockSchemaRegistryClientConfig {
     }
 
     @Bean
-    ConsumerFactory consumerFactory(KafkaProperties properties, KafkaAvroDeserializer deserializer) {
+    ConsumerFactory<?, ?> consumerFactory(KafkaProperties properties, KafkaAvroDeserializer deserializer) {
         return new DefaultKafkaConsumerFactory<>(
             properties.buildConsumerProperties(),
             new StringDeserializer(),
