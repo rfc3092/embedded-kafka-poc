@@ -1,15 +1,7 @@
 package no.nav.poc.kafka.embedded;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import io.confluent.kafka.schemaregistry.testutil.MockSchemaRegistry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.poc.kafka.AppConfig;
 import no.nav.poc.kafka.avro.SomeAvroContent;
@@ -27,6 +19,18 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -53,11 +57,11 @@ public class ProducerConsumerTest {
 
     @Before
     public void before()
-        throws Exception {
+            throws Exception {
 
         schemaRegistryClient.register(config.getTopics().getHot() + "-value", SomeAvroContent.getClassSchema());
         schemaRegistryClient.register(config.getTopics().getCold() + "-value", SomeAvroContent.getClassSchema());
-        Thread.sleep(2000); // Let embedded Kafka get ready.
+        await().atLeast(2, TimeUnit.SECONDS); // Let embedded Kafka get ready.
 
     }
 
@@ -71,39 +75,40 @@ public class ProducerConsumerTest {
             int celcius = random.nextInt(61) - 30; // -30 to 30.
             String message = "This will probably go into the '" + (celcius >= config.getLimit() ? "hot" : "cold") + "' topic...";
             SomeJsonContent content = SomeJsonContent
-                .builder()
-                .celcius(celcius)
-                .message(message)
-                .build();
+                    .builder()
+                    .celcius(celcius)
+                    .message(message)
+                    .build();
             log.info("Preparing to send {}", content);
             SomeJsonContent response = given()
-                .port(port)
-                .contentType(JSON)
-                .accept(JSON)
-                .body(content)
-                .post("/producer")
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(SomeJsonContent.class);
+                    .port(port)
+                    .contentType(JSON)
+                    .accept(JSON)
+                    .body(content)
+                    .post("/producer")
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SomeJsonContent.class);
             log.info("Got UUID {} in response", response.getUuid());
             sent.add(response);
 
         }
 
         SomeJsonContent[] received = given()
-            .port(port)
-            .accept(JSON)
-            .get("/consumer")
-            .then()
-            .assertThat()
-            .statusCode(200)
-            .contentType(JSON)
-            .extract()
-            .body()
-            .as(SomeJsonContent[].class);
+                .port(port)
+                .accept(JSON)
+                .get("/consumer")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .contentType(JSON)
+                .extract()
+                .body()
+                .as(SomeJsonContent[].class);
+
 
         assertThat(sent.size(), equalTo(received.length));
         assertThat(sent, containsInAnyOrder(received));

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-// TODO: Thread safety.
+// Ensure thread safety?
 public class ConsumerService {
 
     private final ConcurrentLinkedQueue<SomeJsonContent> cache = new ConcurrentLinkedQueue<>();
@@ -25,7 +25,7 @@ public class ConsumerService {
         return cache;
     }
 
-    // TODO: Custom error handler.
+    // Add custom error handler?
     @KafkaListener(topics = "${my.config.topics.hot}")
     @KafkaListener(
         clientIdPrefix = "consumeHot",
@@ -37,7 +37,7 @@ public class ConsumerService {
         cache.add(mapToDomain(content.value()));
     }
 
-    // TODO: Custom error handler.
+    // Add custom error handler?
     @KafkaListener(
         clientIdPrefix = "consumeCold",
         topics = "${my.config.topics.cold}",

@@ -32,14 +32,17 @@ class ProducerService {
             log.error("Failed to send message", e);
         } catch (InterruptedException e) {
             log.warn("Interrupted while waiting to send");
+            Thread.currentThread().interrupt();
         }
-        // Just do it synchronized here to make tests behave better...
-/*        template
-            .send(topic, id.toString(), mapFromDomain(content))
-            .addCallback(
-                s -> log.error("Successfully sent message with result {}", s),
-                f -> log.error("Failed to send message", f.getCause())
-            );*/
+        // Just doing it synchronized here, for simplicity. Alternatively, use something like
+        /*
+        template
+                .send(topic, content.getUuid().toString(), mapFromDomain(content))
+                .addCallback(
+                        s -> log.error("Successfully sent message with result {}", s),
+                        f -> log.error("Failed to send message", f.getCause())
+                );
+        */
         return content;
 
     }

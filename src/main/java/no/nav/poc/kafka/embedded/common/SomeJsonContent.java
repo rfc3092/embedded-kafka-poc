@@ -17,9 +17,9 @@ public class SomeJsonContent {
     @Setter
     private UUID uuid;
 
-    private int celcius;
+    private final int celcius;
 
     @NotEmpty
-    private String message;
+    private final String message;
 
 }
