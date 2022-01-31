@@ -19,8 +19,8 @@
   <properties>
     <java.version>11</java.version>
 
-    <avro.version>1.10.2</avro.version>
-    <awaitility.version>4.1.0</awaitility.version>
+    <avro.version>1.11.0</avro.version>
+    <awaitility.version>4.1.1</awaitility.version>
     <kafka-avro-serializer.version>6.2.0</kafka-avro-serializer.version>
   </properties>
 
@@ -69,7 +69,6 @@
       <artifactId>spring-kafka-test</artifactId>
       <scope>test</scope>
     </dependency>
-
     <!-- Avro. -->
     <dependency>
       <groupId>org.apache.avro</groupId>
@@ -98,6 +97,12 @@
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-osgi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
